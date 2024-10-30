@@ -1,9 +1,9 @@
 
 import openai
 import os
-
+from config.settings import api_key
 # Set your OpenAI API key
-openai.api_key = 'sk-fOVJdeTlDVilLPALQtl9_e_9uxJmbuu30FAapnve2HT3BlbkFJSRXFuRf-HtvBz1lm_B6_KViWzKdIkATJgbh7aUAMcA'
+openai.api_key = api_key
 
 def chat_with_gpt(prompt, conversation_history=None):
     if conversation_history is None:

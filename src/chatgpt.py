@@ -1,10 +1,10 @@
 
-import openai
+from openai import OpenAI
 import os
 from config.settings import api_key
 # Set your OpenAI API key
-openai.api_key = api_key
 
+client = OpenAI(api_key=api_key)
 def chat_with_gpt(prompt, conversation_history=None):
     if conversation_history is None:
         conversation_history = []
@@ -14,8 +14,8 @@ def chat_with_gpt(prompt, conversation_history=None):
     
     try:
         # Make a call to the ChatGPT API
-        response = openai.ChatCompletion.create(
-            model="gpt-4o-mini",
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
             messages=conversation_history
         )
         
@@ -25,8 +25,8 @@ def chat_with_gpt(prompt, conversation_history=None):
         
         return gpt_response, conversation_history
     
-    except openai.error.OpenAIError as e:
-        return f"An error occurred: {e}", conversation_history
+    except Exception as e:
+        return f"An error occurred: {e}", ""
 
 def hello():
     return "hello!"

@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 from src.chatgpt import chat_with_gpt
@@ -23,8 +22,8 @@ def main():
         question = speech_to_text("./media/input.wav")
         # Send text to ChatGPT.
         print("Asking: {0}".format(question))
-        qd = json.loads(question)
-        if qd.get("text","") == "":
+      
+        if question == "":
             continue
         gpt_response,_ = chat_with_gpt(question)
         print("Response: {0}".format(gpt_response))

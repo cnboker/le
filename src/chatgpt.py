@@ -3,7 +3,7 @@ from openai import OpenAI
 import os
 from config.settings import api_key
 # Set your OpenAI API key
-
+print(api_key)
 client = OpenAI(api_key=api_key)
 def chat_with_gpt(prompt, conversation_history=None):
     if conversation_history is None:

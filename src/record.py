@@ -1,14 +1,12 @@
 import pyaudio
 import wave
-from config.settings import sample_rate
+from config.settings import sample_rate,question_audio_file_path
 
 def record_wav():
   # Adjust parameters if necessary
     chans = 1
     chunk = 8192
     record_secs = 5 
-    dev_index = 0  # Make sure this matches your input device index
-    wav_output_filename = './media/input.wav'
 
     audio = pyaudio.PyAudio()
     stream = audio.open(format=pyaudio.paInt16, rate=sample_rate, channels=chans,
@@ -35,11 +33,11 @@ def record_wav():
         stream.close()
         audio.terminate()
 
-        with wave.open(wav_output_filename, 'wb') as wf:
+        with wave.open(question_audio_file_path, 'wb') as wf:
             wf.setnchannels(chans)
             wf.setsampwidth(audio.get_sample_size(pyaudio.paInt16))
             wf.setframerate(sample_rate)
             wf.writeframes(b''.join(frames))
-        print(f"Audio recorded and saved as {wav_output_filename}")
+        print(f"Audio recorded and saved as {question_audio_file_path}")
 
     return

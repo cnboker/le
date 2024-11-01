@@ -13,3 +13,4 @@ def test_chat_with_gpt():
 
 def test_hello():
      assert hello() == "hello!"
+

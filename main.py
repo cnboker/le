@@ -1,19 +1,19 @@
 import os
 import sys
 import threading
-from multiprocessing import Process
+from multiprocessing import Process,Queue
 import time
 from src.geminiClient import chat_with_Gemin
 from src.record import record_wav
-from src.stt import speech_to_text
-from src.tts import text_to_speech
+from src.asr import speech_to_text
+from src.tts import text_to_speech_piper
 from src.voice_wake import  monitor_voice
-from src.voice_play import playsound
+from src.voice_play import playsound,play_in_thread
 from config.settings import voice_event,question_audio_file_path,reply_audio_file_path,hi_audio_file_path,wait_audio_file_path
 
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "./src")))
-
-def voice_reply():
+import sounddevice as sd
+def voice_reply(queue):
     # Get WAV from microphone.
     record_wav()
 
@@ -23,55 +23,71 @@ def voice_reply():
     print("Asking: {0}".format(question))
     
     if question == "":
+        queue.put(None)
         return
     gpt_response = chat_with_Gemin(question)
     print("Response: {0}".format(gpt_response))
 
     if gpt_response == "":
+        queue.put(None)
         return
     # Convert ChatGPT response into audio.
-    text_to_speech(gpt_response)
+    text_to_speech_piper(gpt_response)
+    queue.put(reply_audio_file_path)
 
-    # Play audio of reponse.
-    playsound(reply_audio_file_path)
     return
 
 
 def perpare():
      if not os.path.exists(hi_audio_file_path):
-        text_to_speech("来啦", hi_audio_file_path)
+        text_to_speech_piper("在请讲", hi_audio_file_path)
      if not os.path.exists(wait_audio_file_path):
-        text_to_speech("稍等", wait_audio_file_path)
+        text_to_speech_piper("稍等", wait_audio_file_path)
 
 
 if __name__ == "__main__":
     #普通线程在程序中是非守护线程。主线程会等待所有非守护线程完成后再退出。
     #守护线程是一种特殊类型的线程，用于执行后台任务。它的生命周期依赖于主线程。
-    # voice_wake_thread = threading.Thread(target=monitor_voice, daemon=True)    
-    voice_reply_thread = Process(target=voice_reply, daemon=True) 
+    queue = Queue()
+
+
+# 列出所有音频设备
+    devices = sd.query_devices()
+    print(devices)
     perpare()
+    # run()
     while True:
         try:
-            # voice_wake_thread.start()        
-            # voice_event.wait()
-            # voice_event.clear()        
+            voice_wake_thread = threading.Thread(target=monitor_voice, daemon=True) 
+            voice_reply_thread = threading.Thread(target=voice_reply, daemon=True, args=(queue,)) 
+            voice_wake_thread.start()        
+            voice_event.wait()
+            voice_event.clear()        
             # #关闭唤醒线程重新开启
-            # voice_wake_thread.join() 
-            monitor_voice()
+            voice_wake_thread.join() 
+            # monitor_voice()
             print("得到小乐回应")
-            time.sleep(2)
-            if voice_reply_thread.is_alive():
-                voice_reply_thread.terminate()
-                voice_reply_thread.join()
-                voice_reply_thread = Process(target=voice_reply)
-            else:
-                # 正常结束
-                if voice_reply_thread.exitcode == 0:
-                    voice_reply_thread = Process(target=voice_reply)
-                    
+            # time.sleep(2)
+            # voice_reply()
+            # if voice_reply_thread.is_alive():
+            #     voice_reply_thread.terminate()
+            #     voice_reply_thread.join()
+            #     voice_reply_thread = Process(target=voice_reply,args=(queue,), daemon=True, )
+            # else:
+            #     # 正常结束
+            #     if voice_reply_thread.exitcode == 0:
+            #         voice_reply_thread = Process(target=voice_reply, daemon=True, args=(queue,))
+
             voice_reply_thread.start()  
-           
-            time.sleep(5)
+            voice_reply_thread.join()
+
+            #从队列获取子线程结果
+            result = queue.get()
+            if result is not None:
+                print("voice_reply result", result)
+                # Play audio of reponse.
+                play_in_thread(result)
+            #time.sleep(2)
             print('begin new voice_wake')
             # voice_wake_thread = threading.Thread(target=monitor_voice)
             # voice_wake_thread.start()

@@ -1,19 +1,26 @@
 import pyaudio
 import wave
-from config.settings import sample_rate,question_audio_file_path
+from config.settings import sample_rate, question_audio_file_path
+from src.voice_play import playsound
+
 
 def record_wav():
-  # Adjust parameters if necessary
+    # Adjust parameters if necessary
     chans = 1
-    chunk = 8192
-    record_secs = 5 
+    chunk = 1024
+    record_secs = 5
 
     audio = pyaudio.PyAudio()
-    stream = audio.open(format=pyaudio.paInt16, rate=sample_rate, channels=chans,
-                             input=True,
-                            frames_per_buffer=chunk)
+    stream = audio.open(
+        format=pyaudio.paInt16,
+        rate=sample_rate,
+        channels=chans,
+        input=True,
+        frames_per_buffer=chunk,
+    )
+    stream.start_stream()
     try:
-      
+
         print("Recording...")
 
         frames = []
@@ -28,16 +35,15 @@ def record_wav():
 
     finally:
         # Cleanup
-        if stream.is_active():
-            stream.stop_stream()
+        stream.stop_stream()
         stream.close()
         audio.terminate()
 
-        with wave.open(question_audio_file_path, 'wb') as wf:
+        with wave.open(question_audio_file_path, "wb") as wf:
             wf.setnchannels(chans)
             wf.setsampwidth(audio.get_sample_size(pyaudio.paInt16))
             wf.setframerate(sample_rate)
-            wf.writeframes(b''.join(frames))
+            wf.writeframes(b"".join(frames))
         print(f"Audio recorded and saved as {question_audio_file_path}")
 
     return

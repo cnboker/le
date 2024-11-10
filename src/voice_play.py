@@ -23,8 +23,3 @@ def playsound(wavfile):
     print("play file finished:", wavfile)
 
 
-# 启动独立线程播放音频
-def play_in_thread(wavfile):
-    sound_thread = threading.Thread(target=playsound, args=(wavfile,))
-    sound_thread.start()
-    return sound_thread

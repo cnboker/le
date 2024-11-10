@@ -1,30 +1,29 @@
-import vosk
 import wave
-from config.settings import sample_rate,vosk_model
+from config.settings import vosk_model
 import json
+import os
+from vosk import KaldiRecognizer
 
 
 def speech_to_text(speech_file):
-    rec = vosk.KaldiRecognizer(vosk_model, sample_rate)
+     # Open the audio file
+    wf = wave.open(speech_file, "rb")
 
-    wf = wave.open(speech_file,"rb")
-      # To store the full result
-    full_result = []
-
+    # Create a recognizer with the model
+    recognizer = KaldiRecognizer(vosk_model, wf.getframerate())
+  
+    # Read audio data and recognize speech
+    text = ""
     while True:
         data = wf.readframes(4000)
-        if not data:
+        if len(data) == 0:
             break
+        if recognizer.AcceptWaveform(data):
+            result = recognizer.Result()
+            print("speech_to_text", result)
+            text = json.loads(result).get("text", "")
+        # else:
+        #     partial_result = recognizer.PartialResult()
+        #     print(partial_result)
 
-        if rec.AcceptWaveform(data):
-            result = json.loads(rec.Result())  # Full result in JSON format
-            full_result.append(result.get("text", ""))
-     # Add any remaining partial result (for last incomplete phrase)
-    final_result = json.loads(rec.FinalResult()).get("text", "")
-    full_result.append(final_result)
-    # close the audio file
-    wf.close()
-
-    print("full_result:{0}",format(full_result))
-     # Return the combined results as a single string
-    return " ".join(full_result)
+    return text

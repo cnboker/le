@@ -1,4 +1,6 @@
-.venv/
+raspberryos_settings
+piper/
+myenv/
 .pytest_cache/
 media/
 config/

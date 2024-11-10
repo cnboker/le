@@ -7,7 +7,7 @@ from src.voice_play import playsound
 def record_wav():
     # Adjust parameters if necessary
     chans = 1
-    chunk = 1024
+    chunk = 2048
     record_secs = 5
 
     audio = pyaudio.PyAudio()

@@ -28,6 +28,7 @@ def monitor_voice():
     )
     input_stream.start_stream()
 
+
     print("Listening for '小乐'...")
 
     output = ""
@@ -37,7 +38,8 @@ def monitor_voice():
 
     try:
         while not task_finished:
-            audio_playing = detect_speaker_playback()
+            #audio_playing = detect_speaker_playback()
+            audio_playing = False #取消噪音过滤，功能不工作
             print("audio_playing", audio_playing)
             #audio_playing = False
             # 如果扬声器在播放做降噪处理

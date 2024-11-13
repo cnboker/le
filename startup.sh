@@ -17,7 +17,7 @@ fi
 
 # 开启 VPN 连接
 echo "Starting VPN connection..."
-echo "c myvpn" | /var/run/xl2tpd/l2tp-control 
+echo "c myvpn" > /var/run/xl2tpd/l2tp-control
 if [ $? -eq 0 ]; then
     echo "VPN connection started"
 else

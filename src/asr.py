@@ -1,14 +1,13 @@
 import wave
-from config.settings import vosk_model
+from config.audio_model import detect_model
 import json
-import os
 from vosk import KaldiRecognizer
 
 
 def speech_to_text(speech_file):
      # Open the audio file
     wf = wave.open(speech_file, "rb")
-
+    vosk_model = detect_model(speech_file)
     # Create a recognizer with the model
     recognizer = KaldiRecognizer(vosk_model, wf.getframerate())
   

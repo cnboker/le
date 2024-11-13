@@ -2,7 +2,8 @@ import time
 import pyaudio
 import vosk
 import json
-from config.settings import sample_rate, vosk_model, voice_event, hi_audio_file_path
+from config.settings import sample_rate, voice_event, hi_audio_file_path
+from config.audio_model import vosk_model
 from src.voice_play import playsound
 import numpy as np
 from src.audio_util import detect_speaker_playback, noise_reduction

@@ -4,7 +4,8 @@ import sys
 import time
 import sounddevice as sd
 import numpy as np
-from config.settings import vosk_model, sample_rate, voice_event, hi_audio_file_path
+from config.settings import sample_rate, voice_event, hi_audio_file_path
+from config.audio_model import vosk_model
 import vosk
 from src.voice_play import playsound
 

@@ -62,3 +62,16 @@ sudo journalctl -u networking.service
 ```bash
 speaker-test -c2
 ```
+
+# mp3 tirm
+
+<!-- -i input.mp3: Specifies the input MP3 file.
+-t 10: Specifies the duration of the output (first 10 seconds).
+-acodec pcm_s16le: Sets the audio codec to PCM 16-bit little-endian (standard for WAV).
+-ar 44100: Sets the audio sample rate to 44.1 kHz (CD quality).
+-ac 2: Sets the number of audio channels to 2 (stereo).
+output.wav: Specifies the output WAV file name. -->
+```bash
+ffmpeg -i input.mp3 -t 10 -acodec pcm_s16le -ar 44100 -ac 2 output.wav
+
+```

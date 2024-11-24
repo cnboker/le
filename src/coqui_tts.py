@@ -1,3 +1,4 @@
+from io import BytesIO
 import threading
 from time import sleep
 import time
@@ -8,7 +9,7 @@ import socketio.exceptions
 import sounddevice as sd
 from config.settings import tts_server
 from datetime import datetime
-
+from pydub import AudioSegment
 # Initialize an empty list for incoming audio data
 audio_buffer = []
 is_playing = False  # Track if audio is currently playing
@@ -21,12 +22,16 @@ def play_audio():
     while True:
         # 仅当audio_buffer有数据且当前没有播放时，才开始播放
         if audio_buffer and not is_playing:
-            # 将所有缓冲区中的音频数据拼接成一个数组用于播放
-            audio_data_to_play = np.concatenate(audio_buffer)
-            
+             # Combine buffered MP3 data
+            mp3_data_to_play = b"".join(audio_buffer)
+
+            # Decode MP3 into PCM using pydub
+            audio_segment = AudioSegment.from_mp3(BytesIO(mp3_data_to_play))
+            pcm_data = np.array(audio_segment.get_array_of_samples(), dtype=np.int16)
+
             # 启动非阻塞播放
             is_playing = True  # 设置正在播放标志
-            sd.play(audio_data_to_play, samplerate=22050)
+            sd.play(pcm_data, samplerate=24000)
 
             # 清空已播放的数据缓冲区
             audio_buffer.clear()
@@ -96,5 +101,4 @@ def connect_to_server():
       
        
 
-connect_to_server()
 
